@@ -1,0 +1,171 @@
+---
+- hosts: all
+  connection: local
+  vars:
+    host_folder: "external/{{ ansible_facts['hostname'] }}"
+    common_folder: 'external/common'
+    oh_my_zsh_theme: agnoster
+    install_iterm: true
+    sublime_base_path: '~/Library/Application Support/Sublime Text'
+    sublime_config_path: 'Packages/User'
+    report_path: 'Documents/Reports'
+    # homebrew_upgrade_all_packages: true
+
+  pre_tasks:
+    - name: Include common configuration options
+      tags: ['always']
+      include_vars:
+        dir: '{{ common_folder }}'
+        name: common_config
+        ignore_unknown_extensions: True
+        #         ignore_files:
+        #           - 'bastion.yaml'
+        extensions:
+          - 'yml'
+          - 'yaml'
+      when: common_folder is exists
+    - debug:
+        var: common_config
+
+    - name: Include host-specific configuration options
+      tags: ['always']
+      include_vars:
+        dir: '{{ host_folder }}'
+        name: host_config
+        extensions:
+          - 'yml'
+          - 'yaml'
+      when: host_folder is exists
+    - debug:
+        var: host_config
+
+    - set_fact:
+        merged_config: "{{ common_config | combine(host_config, list_merge='append') }}"
+      tags: ['always']
+
+    - debug:
+        var: merged_config
+
+    - import_tasks: tasks/home/folders.yml
+      vars:
+        home_folders: '{{ merged_config.home_folders | default([]) }}'
+
+    - import_tasks: tasks/home/repos.yml
+      vars:
+        cloned_repos: '{{ merged_config.cloned_repos | default([]) }}'
+
+  roles:
+    - role: elliotweiser.osx-command-line-tools
+      # when: install_cli_tools
+      tags: ['cli-tools']
+
+    # - role: setup_macos
+    #   when: configure_osx
+
+    - role: geerlingguy.pip
+      when: pip_install_packages
+      tags: ['pip', 'python']
+      vars:
+        pip_package: python3
+        pip_install_packages: '{{ merged_config.pip_install_packages | default([]) }}'
+
+    # - role: geerlingguy.mac.homebrew
+    #   when: homebrew_installed_packages
+    #   tags: ['homebrew', 'brew']
+    #   vars:
+    #     homebrew_installed_packages: '{{ merged_config.homebrew_installed_packages | default([]) }}'
+    #     homebrew_cask_apps: '{{ merged_config.homebrew_cask_apps | default([]) }}'
+    #     homebrew_taps: '{{ merged_config.homebrew_taps | default([]) }}'
+    #     homebrew_uninstalled_packages: '{{ merged_config.homebrew_uninstalled_packages | default([]) }}'
+    #     homebrew_cask_uninstalled_apps: '{{ merged_config.homebrew_cask_uninstalled_apps | default([]) }}'
+
+    - role: geerlingguy.mac.dock
+      when: dockitems_persist or dockitems_remove
+      tags: ['dock']
+      vars:
+        dockitems_persist: '{{ merged_config.dockitems_persist | default([]) }}'
+        dockitems_remove: '{{ merged_config.dockitems_remove | default([]) }}'
+
+    - role: geerlingguy.mac.mas
+      when: mas_installed_apps or mas_uninstalled_apps
+      tags: ['apps', 'store']
+      vars:
+        mas_installed_apps: '{{ merged_config.mas_installed_apps | default([]) }}'
+        mas_uninstalled_apps: '{{ merged_config.mas_uninstalled_apps | default([]) }}'
+
+    # - role: sicruse.powerline-fonts
+    #   when: powerline_fonts
+
+    #  git clone https://github.com/zsh-users/zsh-history-substring-search ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-history-substring-search
+    # git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-completions
+    # git clone https://github.com/olivierverdier/zsh-git-prompt ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-git-prompt
+
+    - role: gantsign.oh-my-zsh
+      tags: ['zsh', 'shell', 'oh-my-zsh']
+      users:
+        - username: '{{ ansible_user_id }}'
+          oh_my_zsh:
+            theme: powerlevel10k
+            plugins:
+              - git
+              - zsh-autosuggestions
+              - macos
+              - zsh-completions
+              - docker
+              - docker-compose
+              - you-should-use
+              - fast-syntax-highlighting
+              - zsh-navigation-tools
+              # - zsh-async
+              # - zsh-git-prompt
+              - zsh-syntax-highlighting
+              - zsh-history-substring-search
+
+    - role: diodonfrost.p10k
+      tags: ['zsh', 'shell', 'oh-my-zsh', 'p10k']
+      # when: oh_my_zsh_theme == "powerlevel10k"
+      vars:
+        zsh_plugin: ohmyzsh
+        p10k_prompt_frame: 'no'
+        p10k_prompt_style: 'classic'
+        p10k_prompt_separator: 'round'
+        p10k_prompt_head: 'round'
+        p10k_prompt_spacing: 'sparse'
+
+    - role: gantsign.visual-studio-code
+      # when: visual_studio_code_extensions or visual_studio_code_extensions_absent
+      tags: ['code', 'editor', 'vs-code']
+      users:
+        - username: '{{ ansible_user_id }}'
+          visual_studio_code_extensions: '{{ merged_config.visual_studio_code_extensions | default([]) }}'
+          visual_studio_code_extensions_absent: '{{ merged_config.visual_studio_code_extensions_absent | default([]) }}'
+
+  tasks:
+    - import_tasks: tasks/terminals/iterm.yml
+      when: install_iterm
+      tags: ['iterm', 'terminal']
+
+    # - import_tasks: tasks/terminals/terminal.yml
+    #   # when: install_terminal
+    #   tags: ['mac-terminal', 'terminal']
+
+    - import_tasks: tasks/editors/sublime-text.yml
+      # when: install_iterm
+      tags: ['sublime']
+      vars:
+        sublime_package_control: '{{ merged_config.sublime_package_control | default([]) }}'
+
+    - import_tasks: tasks/report/generate.yml
+      tags: ['report']
+
+    # - name: Declare preffered edit
+    #   blockinfile:
+    #     path: '~/.profile'
+    #     block: |
+    #       # Preferred editor for local and remote sessions
+    #       if [[ -n $SSH_CONNECTION ]]; then # SSH mode
+    #         export EDITOR='vim'
+    #       else # Local terminal mode
+    #         export EDITOR='code -w'
+    #       fi
+    #       export VISUAL="$EDITOR"

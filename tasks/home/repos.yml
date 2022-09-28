@@ -1,0 +1,14 @@
+- name: Repos
+  become: yes
+  ignore_errors: yes
+  git:
+    repo: "{{ item.repo }}"
+    dest: "~/{{ item.destination | default('Documents') }}"
+    accept_hostkey: yes
+    key_file: ~/.ssh/id_rsa
+    clone: yes
+    update: yes
+    # version: "{{ item.branch | default('master') }}"
+    # recursive: "{{ item.recursive | default(omit) }}"
+  become_user: "{{ ansible_user_id }}"
+  loop: "{{ cloned_repos }}"

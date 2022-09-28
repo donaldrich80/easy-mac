@@ -1,0 +1,4 @@
+- name: Upgrade brew
+  community.general.homebrew:
+  update_homebrew: yes
+  upgrade_all: yes

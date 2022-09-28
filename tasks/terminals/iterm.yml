@@ -1,0 +1,57 @@
+- name: Check if iterm2 is installed
+  homebrew_cask:
+    name: 'iterm2'
+    state: present
+    # install_options: "appdir={{ homebrew_cask_appdir }}"
+
+- name: Cloning fonts
+  git:
+    repo: 'https://github.com/powerline/fonts'
+    dest: '~/.config/powerlinefonts'
+    accept_hostkey: yes
+  register: fontCloned
+  become: no
+
+- name: Install Fonts
+  shell: ~/.config/powerlinefonts/install.sh
+  args:
+    chdir: '~/.config/powerlinefonts'
+  when: fontCloned
+  become: no
+# - name: iTerm custom settings file
+#   osx_defaults:
+#     domain: com.googlecode.iterm2
+#     key: PrefsCustomFolder
+#     type: string
+#     value: "{{ ansible_env.PWD }}/roles/setup_terminal/files"
+
+# - hosts: localhost
+#   connection: local
+#   roles:
+#     - role: tkimball83.iterm2
+#       iterm2_defaults:
+#         - name: OnlyWhenMoreTabs
+#           type: string
+#           value: 0
+#         - name: PromptOnQuit
+#           type: bool
+#           value: false
+# - role: lwalley.iterm2
+#   # when: install_cli_tools
+#   tags: ['terminal']
+#   vars:
+#     iterm2_fonts:
+#       - url: https://github.com/powerline/fonts/blob/master/Meslo%20Slashed/Meslo%20LG%20M%20Regular%20for%20Powerline.ttf?raw=true
+#     # GUIDs for dynamic profile must be unique, if one already exists the
+#     # profile will not be loaded.
+#     # iterm2_dynamic_profiles:
+#     #   - url: https://api.bitbucket.org/2.0/repositories/example/example/src/master/iTerm2/DynamicProfiles/example.json
+#     #     user: example
+#     #     password: 123abc
+#     iterm2_dynamic_profiles_local:
+#       - ~/path/to/profiles/example.json
+#     iterm2_preferences_custom_folder: ~/example/iTerm2/Preferences
+#     # If loading preferences from a custom folder your default profile GUID
+#     # will likely already be set, so you can skip adding the profile GUID.
+#     # iterm2_default_profile_guid: 40B423CE-3599-4BF2-8C92-33CE033157B1
+#     iterm2_shell_integration: yes

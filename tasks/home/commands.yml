@@ -1,0 +1,3 @@
+- name: Running list of shell commands
+  ansible.builtin.shell: '{{ item }}'
+  loop: '{{ shell_commands }}'

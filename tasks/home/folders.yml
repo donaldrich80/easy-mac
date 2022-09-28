@@ -1,0 +1,9 @@
+- name: Populate home directories
+  become: true
+  become_user: "{{ ansible_user_id }}"
+  file:
+    path: "~/{{ item }}"
+    state: directory
+    owner: "{{ ansible_user_id }}"
+    group: "staff"
+  loop: "{{ home_folders }}"

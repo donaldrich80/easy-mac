@@ -1,0 +1,21 @@
+- hosts: all
+  connection: local
+  # become: true
+  roles:
+    - role: geerlingguy.pip
+      tags: ["pip", "python"]
+      vars:
+        pip_package: python3
+      pip_install_packages:
+        - name: pip
+          state: latest
+  tasks:
+    #   - community.general.homebrew:
+    #     update_homebrew: yes
+    #     upgrade_all: yes
+    - import_tasks: tasks/maintain/homebrew.yml
+    - name: Find /var/log all directories, exclude nginx and mysql
+      find:
+        paths: /Users/donaldrich
+        recurse: yes
+        file_type: directory

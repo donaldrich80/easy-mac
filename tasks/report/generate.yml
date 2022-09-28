@@ -1,0 +1,33 @@
+- name: Populate home directories
+  # become: true
+  # become_user: "{{ ansible_user_id }}"
+  file:
+    path: '~/{{ report_path }}/EasyMac'
+    state: directory
+    owner: '{{ ansible_user_id }}'
+    group: 'staff'
+
+- name: Change the working directory to somedir/ before executing the command
+  ansible.builtin.shell: mas list > 'App Store Apps.txt'
+  args:
+    chdir: '~/{{ report_path }}/EasyMac'
+
+- name: Change the working directory to somedir/ before executing the command
+  ansible.builtin.shell: code --list-extensions > 'VS Code Extensions.txt'
+  args:
+    chdir: '~/{{ report_path }}/EasyMac'
+
+- name: Brew list
+  ansible.builtin.shell: brew list -l > 'Brew Packages.txt'
+  args:
+    chdir: '~/{{ report_path }}/EasyMac'
+
+- name: Change the working directory to somedir/ before executing the command
+  ansible.builtin.shell: defaults read com.googlecode.iterm2 > 'iTerm_configuration.txt'
+  args:
+    chdir: '~/{{ report_path }}/EasyMac'
+
+- name: Change the working directory to somedir/ before executing the command
+  ansible.builtin.shell: defaults domains > 'MacOS Default Domains.txt'
+  args:
+    chdir: '~/{{ report_path }}/EasyMac'

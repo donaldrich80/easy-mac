@@ -1,0 +1,30 @@
+---
+roles:
+  - src: elliotweiser.osx-command-line-tools
+    version: master
+
+  - src: geerlingguy.dotfiles
+    version: master
+
+  - src: gantsign.visual-studio-code
+    version: master
+
+  - src: geerlingguy.pip
+    version: master
+
+  - src: gantsign.oh-my-zsh
+    version: master
+
+  - src: diodonfrost.p10k
+    version: master
+
+  - src: sicruse.powerline-fonts
+    version: master
+
+  # - src: lwalley.iterm2
+  #   version: master
+  - src: https://github.com/lwalley/ansible-role-iterm2
+    version: master
+# https://github.com/tkimball83/ansible-role-iterm2
+collections:
+  - name: geerlingguy.mac
