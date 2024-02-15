@@ -203,22 +203,15 @@ Use Mac virtualbox <https://github.com/geerlingguy/macos-virtualbox-vm>
 - <https://github.com/osxc>
 - <https://github.com/MWGriffin/ansible-playbooks/blob/master/sourcetree/sourcetree.yaml>
 - <https://github.com/sindresorhus/quick-look-plugins>
-
-<https://galaxy.ansible.com/elliotweiser/osx-command-line-tools>
-<https://github.com/Geektrovert/AwsTerm>
-<https://github.com/topics/apple>
-<https://github.com/donnemartin/dev-setup>
-<https://github.com/atomantic/dotfiles>
-
-# https://galaxy.ansible.com/elliotweiser/osx-command-line-tools
-# https://galaxy.ansible.com/gantsign/oh-my-zsh
-
-# https://galaxy.ansible.com/diodonfrost/p10k
-
-# https://galaxy.ansible.com/gantsign/visual-studio-code
-
-<https://galaxy.ansible.com/sicruse/powerline-fonts>
-
-
-github.com/scrooloose/nerdtree.git
+- <https://galaxy.ansible.com/elliotweiser/osx-command-line-tools>
+- <https://github.com/Geektrovert/AwsTerm>
+- <https://github.com/topics/apple>
+- <https://github.com/donnemartin/dev-setup>
+- <https://github.com/atomantic/dotfiles>
+- <https://galaxy.ansible.com/elliotweiser/osx-command-line-tools>
+- <https://galaxy.ansible.com/gantsign/oh-my-zsh>
+- <https://galaxy.ansible.com/diodonfrost/p10k>
+- <https://galaxy.ansible.com/gantsign/visual-studio-code>
+- <https://galaxy.ansible.com/sicruse/powerline-fonts>
+- <https://github.com/scrooloose/nerdtree.git>
 
